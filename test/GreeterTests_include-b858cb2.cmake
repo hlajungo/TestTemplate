@@ -1,0 +1,5 @@
+if(EXISTS "/media/hlajungo/D/linux/test_place/cuda/UseCuda/TestTemplate/test/GreeterTests_tests-b858cb2.cmake")
+  include("/media/hlajungo/D/linux/test_place/cuda/UseCuda/TestTemplate/test/GreeterTests_tests-b858cb2.cmake")
+else()
+  add_test(GreeterTests_NOT_BUILT-b858cb2 GreeterTests_NOT_BUILT-b858cb2)
+endif()

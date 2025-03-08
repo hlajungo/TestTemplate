@@ -1,53 +1,55 @@
-#include <greeter/greeter.h>
-#include <greeter/version.h>
-
-#include <cxxopts.hpp>
 #include <iostream>
-#include <string>
-#include <unordered_map>
+#include <type_traits>
+#include <cuda_runtime.h>
 
-auto main(int argc, char** argv) -> int {
-  const std::unordered_map<std::string, greeter::LanguageCode> languages{
-      {"en", greeter::LanguageCode::EN},
-      {"de", greeter::LanguageCode::DE},
-      {"es", greeter::LanguageCode::ES},
-      {"fr", greeter::LanguageCode::FR},
-  };
+#include "UseCudaLib.h"
 
-  cxxopts::Options options(*argv, "A program to welcome the world!");
+class My_compute : public Use_cuda
+{
+public:
+  virtual void my_compute(int x) = 0;
+};
 
-  std::string language;
-  std::string name;
+// 子類：定義不同版本的函數
+class My_cuda_task : public My_compute
+{
+  public:
 
-  // clang-format off
-  options.add_options()
-    ("h,help", "Show help")
-    ("v,version", "Print the current version number")
-    ("n,name", "Name to greet", cxxopts::value(name)->default_value("World"))
-    ("l,lang", "Language code to use", cxxopts::value(language)->default_value("en"))
-  ;
-  // clang-format on
+    // CUDA 版本
+    void my_compute(int x) override
+    {
+      std::cout << "MyCudaTask: CUDA 計算, x = " << x << std::endl;
+    }
 
-  auto result = options.parse(argc, argv);
+};
 
-  if (result["help"].as<bool>()) {
-    std::cout << options.help() << std::endl;
-    return 0;
-  }
+class My_cpu_task : public My_compute
+{
+  public:
+    // CPU 版本
+    void my_compute(int x)
+    {
+      std::cout << "MyCudaTask: CPU 計算, x = " << x << std::endl;
+    }
+};
 
-  if (result["version"].as<bool>()) {
-    std::cout << "Greeter, version " << GREETER_VERSION << std::endl;
-    return 0;
-  }
 
-  auto langIt = languages.find(language);
-  if (langIt == languages.end()) {
-    std::cerr << "unknown language code: " << language << std::endl;
+int main() {
+
+  My_compute* mc0 = new My_cpu_task();
+  mc0->my_compute(0);
+
+  My_compute* mc1 = new My_cuda_task();
+  if (!mc1->get_has_gpu())
+  {
+    std::cerr << "Didn't find available GPU." << std::endl;
     return 1;
   }
+  mc1->my_compute(1);
 
-  greeter::Greeter greeter(name);
-  std::cout << greeter.greet(langIt->second) << std::endl;
 
   return 0;
 }
+
+
+

@@ -1,21 +1,24 @@
 #include <doctest/doctest.h>
-#include <greeter/greeter.h>
-#include <greeter/version.h>
-
+#include <UseCudaLib.h>
+#include <usecudalib/version.h>
+#include <cuda_runtime.h>
 #include <string>
 
-TEST_CASE("Greeter") {
-  using namespace greeter;
+class Test_class : public Use_cuda
+{
 
-  Greeter greeter("Tests");
+};
 
-  CHECK(greeter.greet(LanguageCode::EN) == "Hello, Tests!");
-  CHECK(greeter.greet(LanguageCode::DE) == "Hallo Tests!");
-  CHECK(greeter.greet(LanguageCode::ES) == "¡Hola Tests!");
-  CHECK(greeter.greet(LanguageCode::FR) == "Bonjour Tests!");
+TEST_CASE("UseCudaLib") {
+//  using namespace UseCudaLib;
+  Test_class* t = new Test_class();
+
+  CHECK(t->get_has_gpu() == true);
+  
+  free(t);
+  t = nullptr;
 }
-
-TEST_CASE("Greeter version") {
-  static_assert(std::string_view(GREETER_VERSION) == std::string_view("1.0"));
-  CHECK(std::string(GREETER_VERSION) == std::string("1.0"));
+TEST_CASE("UseCudaLib version") {
+  static_assert(std::string_view(USECUDALIB_VERSION) == std::string_view("1.0"));
+  CHECK(std::string(USECUDALIB_VERSION) == std::string("1.0"));
 }
