@@ -29,22 +29,21 @@ endif()
 file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 add_executable(${PROJECT_NAME} ${sources})
 target_link_libraries(${PROJECT_NAME} doctest::doctest UseCudaLib::UseCudaLib)
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 17)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 
 
-message(STATUS "CMAKE_CXX_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "CMAKE_CUDA_COMPILER_ID: ${CMAKE_CXX_COMPILER_ID}")
 # enable compiler warnings
 if(NOT TEST_INSTALLED_VERSION)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(UseCudaLib PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    #target_compile_options(UseCudaLib PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    target_compile_options(UseCudaLib PUBLIC 
+      $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wpedantic -Wextra -Werror>
+      $<$<COMPILE_LANGUAGE:CUDA>:--compiler-options=-Wall,-Wextra,-Werror>
+    )
   elseif(MSVC)
     target_compile_options(UseCudaLib PUBLIC /W4 /WX)
     target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
-  elseif(CMAKE_CXX_COMPILER_ID MATCHES "NVIDIA")  # 針對 NVCC
-    target_compile_options(UseCudaLib PUBLIC 
-      $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror>  # 只對 C++ 有效
-      $<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=-Wall,-Xcompiler=-Wextra,-Xcompiler=-Werror>  # 只對 CUDA 有效
-    )
   endif()
 endif()
 

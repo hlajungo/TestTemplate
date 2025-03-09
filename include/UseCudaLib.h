@@ -15,13 +15,11 @@ class Use_cuda {
      * @return 如果有可用的 GPU，返回 true，否則返回 false。
      */
     bool get_has_gpu();
-
   protected:
     /**
      * @brief 構造函數，初始化 GPU 檢測。
      */
     Use_cuda();
-
   private:
     bool has_gpu; ///< 是否有 GPU
     /**
@@ -29,7 +27,6 @@ class Use_cuda {
      * @param val 設置值
      */
     void set_has_gpu(bool val);
-
     /**
      * @brief 檢測是否有 GPU 設備。
      * @return 如果有 GPU，返回 true，否則返回 false。
